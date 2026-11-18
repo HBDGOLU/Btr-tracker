@@ -1,0 +1,419 @@
+<!DOCTYPE html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b0a1e"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><title>BTR Study Tracker</title>
+<style>
+:root{--bg:#f4f1ff;--fg:#1b1440;--c:#ffffffcc;--b:#0002;--a:#7c3aed;--a2:#06b6d4;--g:#10b981;--r:#ef4444;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b0a1e;--fg:#eef0ff;--c:#ffffff12;--b:#ffffff25}}
+:root[data-theme=dark]{--bg:#0b0a1e;--fg:#eef0ff;--c:#ffffff12;--b:#ffffff25}
+*{box-sizing:border-box}html{color-scheme:light dark}
+body{margin:0;background:radial-gradient(circle at 20% 0,#7c3aed55,transparent 45%),radial-gradient(circle at 90% 30%,#06b6d444,transparent 40%),var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-bottom:78px;min-height:100vh}
+main{max-width:720px;margin:auto;padding:14px}
+h2{margin:6px 0 10px;background:linear-gradient(90deg,var(--a),var(--a2));-webkit-background-clip:text;color:transparent}
+.card{background:var(--c);border:1px solid var(--b);border-radius:16px;padding:12px;margin:10px 0;backdrop-filter:blur(8px)}
+.clock{font:800 clamp(44px,15vw,92px)/1 ui-monospace,monospace;text-align:center;padding:26px 0;letter-spacing:2px;background:linear-gradient(90deg,var(--a),var(--a2));-webkit-background-clip:text;color:transparent}
+.run{animation:pulse 1.4s infinite}@keyframes pulse{50%{filter:drop-shadow(0 0 18px var(--a2));transform:scale(1.03)}}
+button,select,input{font:inherit;color:var(--fg);background:var(--c);border:1px solid var(--b);border-radius:12px;padding:10px}
+button{cursor:pointer}.big{display:block;width:100%;font-size:20px;font-weight:700;background:linear-gradient(90deg,var(--a),var(--a2));color:#fff;border:0;padding:16px}
+.stop{background:linear-gradient(90deg,#ef4444,#f59e0b)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 4px;border-bottom:1px solid var(--b);text-align:left}th{opacity:.7}.w{overflow-x:auto}
+.bar{height:9px;border-radius:9px;background:var(--b);overflow:hidden;margin:3px 0}.bar i{display:block;height:100%;border-radius:9px;transition:width .6s}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--b);z-index:5}
+nav button{flex:1;padding:12px 4px}nav .on{background:linear-gradient(90deg,var(--a),var(--a2));color:#fff;border:0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.chips button{white-space:nowrap}.chips .on{background:var(--a);color:#fff}
+.up{color:var(--g)}.dn{color:var(--r)}.sm{font-size:12px;opacity:.75}.row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.gh{font-weight:800;letter-spacing:1px;background:#1e3a6e;color:#fff;padding:6px 10px;border-radius:8px;margin:12px 0 6px}
+.sb{margin:3px;font-size:13px}.sb.on{background:var(--a);color:#fff}
+.modal{position:fixed;inset:0;background:#000a;z-index:9;display:flex;align-items:flex-end;justify-content:center}.modal>div{background:var(--bg);width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px}
+.modal input,.modal select{width:100%;margin:4px 0}
+.fx{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;animation:fi .4s}
+.fx.win{background:radial-gradient(#10b981cc,#064e3bee)}.fx.lose{background:radial-gradient(#ef4444cc,#450a0aee);animation:fi .4s,shake .5s .4s 3}
+.fx .big{font-size:110px;width:auto;background:none;animation:pop 1s infinite alternate}.fx h1{color:#fff;font-size:44px;margin:0}.fx p{color:#fff;padding:0 20px}
+.cf{position:absolute;top:-20px;width:10px;height:16px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}@keyframes pop{to{transform:scale(1.25) rotate(8deg)}}@keyframes fi{from{opacity:0}}@keyframes shake{25%{transform:translateX(-14px)}75%{transform:translateX(14px)}}
+body{background:linear-gradient(135deg,#7c3aed33,#06b6d433,#f472b633,#7c3aed33) fixed,var(--bg);background-size:300% 300%,auto;animation:bg 14s ease infinite}
+@keyframes bg{50%{background-position:100% 100%,0 0}}@keyframes up{from{opacity:0;transform:translateY(14px)}}
+.card{animation:up .45s both;box-shadow:0 8px 30px -14px #7c3aed}
+.hero{text-align:center;border:1px solid #7c3aed88;box-shadow:0 0 40px -10px #22d3ee}
+.cw{position:relative;width:min(78vw,300px);margin:6px auto}.cw svg{width:100%;transform:rotate(-90deg);filter:drop-shadow(0 0 6px #22d3ee)}
+#rg{transition:stroke-dashoffset .3s linear}
+.dig{position:absolute;inset:0;display:grid;place-items:center;font:800 clamp(30px,9.5vw,50px) ui-monospace,monospace;text-shadow:0 0 18px #7c3aed}
+.st{margin:4px 0 10px;opacity:.85}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.ch{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:6px 8px}.ch b{font-size:12px}.ch svg{width:100%}
+.rb{transform-box:fill-box;transform-origin:bottom;animation:grow .8s both}@keyframes grow{from{transform:scaleY(0)}}
+.ring{width:54px;height:54px;border-radius:50%;flex:none;background:conic-gradient(var(--c1,#22d3ee) calc(var(--p)*1%),var(--b) 0);display:grid;place-items:center;position:relative}
+.ring:before{content:'';position:absolute;inset:6px;border-radius:50%;background:var(--bg)}.ring span{position:relative;font-size:12px;font-weight:700}
+.four{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;gap:4px;margin:10px 0}.cc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.sj{border-left:4px solid var(--c1)}.sj.op{box-shadow:0 0 0 1.5px var(--c1),0 0 30px -8px var(--c1)}
+button:active{transform:scale(.96)}.big{box-shadow:0 8px 24px -8px var(--a)}
+.ps{table-layout:fixed;width:100%;font-size:12px}.ps td,.ps th{padding:5px 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ps tr.d0 td{border-top:3px solid var(--fg)}.ps .tp{font-size:10px;opacity:.65;overflow:hidden;text-overflow:ellipsis}
+.tg{border:1px solid #f472b688;background:linear-gradient(135deg,#f472b622,#7c3aed22)}
+</style></head><body><main id="app"></main>
+<nav><button id="n0">⏱ Clock</button><button id="n1">📅 Plan</button><button id="n2">📊 Data</button></nav>
+<script>
+const D=`@PM|PSM|L|6|16
+Epidemiology|167|100
+Biostatistics|112|56
+Vaccines|90|46
+Demography|61|25
+Nutrition|45|12
+Health programs|96|54
+Environment|60|25
+Miscellaneous|60|68
+@OB|OBGY|L|7|15
+Anatomy and prolapse|43|55
+Menstrual physiology|24|0
+Mullerian anomalies-Infertility|44|61
+Amenorrhea-DSD|50|0
+AUB|43|43
+Endometriosis-PCOD|32|0
+Uro-gynecology|14|58
+Gyne-oncology|86|0
+Contraception|62|44
+Basics of obstetrics|87|52
+Early pregnancy complications|58|59
+Medical diseases in pregnancy|77|36
+Twin pregnancy|20|28
+Rh isoimmunization|12|0
+IUGR|11|0
+Placenta and APH|26|104
+Fetal monitoring|20|0
+Pelvis-Skull|16|0
+Labour and its complications|117|7
+@SU|Surgery|L|10|35
+General surgery|80|90
+Trauma and burns|126|110
+Thyroid and parathyroid|60|52
+Breast|60|48
+Vascular surgery|49|40
+Wounds and grafts|34|0
+Urology|78|38
+GI surgery|138|111
+Hepatobiliary surgery|68|44
+Pancreas|27|29
+Hernia|33|0
+Transplant surgery|9|24
+@CVS|CVS|I|6|38
+Arrhythmias and ECG|77|97
+ACS, MI|30|27
+JVP-pulse|18|43
+Heart sounds and murmurs|35|0
+CVS graphs and physiology|38|47
+CHF|30|48
+Cardiomyopathy, ARF|30|0
+Dyslipidemia|12|0
+Hypertension|23|6
+@RS|Respiratory|I|5|24
+Respiratory physiology and spirometry|45|89
+ARDS|11|62
+Pleural effusion-PE-PAH|28|0
+Chest infections|19|0
+Asthma-COPD|45|0
+ILD|20|29
+Carcinoma lung|17|0
+@GI|GI_HB|I|4|11
+GI physiology|13|54
+GI pharmacology|24|0
+Ascites-chronic diarrhea|26|0
+Polyps and syndromes|11|55
+IBD|18|0
+Liver diseases|35|0
+Viral hepatitis|25|0
+@RH|Rheumatology|I|3|7
+Connective tissue diseases|29|59
+Arthritis|54|0
+Vasculitis|26|29
+Myopathy|5|0
+Miscellaneous|4|0
+@HM|Hematology|I|6|17
+RBC disorders|89|96
+WBC disorders|76|62
+Platelet and coagulation disorders|55|70
+Transfusion medicine|28|0
+@NE|Neurology|I|6|24
+Sensory receptors and nerve fibres|14|60
+Hypothalamus/Thalamus/Memory|17|0
+Basal ganglia and movement disorders|20|30
+Dementia/Headache|39|0
+Meningitis/Demyelinating disorders|33|46
+Spinal cord lesions|31|0
+Stroke|36|80
+Seizures|36|0
+Brain death|9|39
+@RN|Renal_Electrolytes|I|4|11
+Renal physiology and graphs|26|78
+Renal tubules, Diuretics|47|0
+Glomerular diseases|38|73
+AKI-CKD|29|0
+Acid-base and electrolytes|48|0
+@EN|Endocrinology|I|4|17
+Diabetes|51|61
+Pituitary disorders|41|66
+Adrenal disorders and carcinoid|46|0
+Thyroid disorders|31|27
+Parathyroid disorders|19|0
+@GP|General Pathology|I|3|21
+Cell injury|31|45
+Miscellaneous pathology|46|0
+Neoplasia|40|32
+@IM|Immunology|I|3|17
+Basics of immunology|42|51
+Immunodeficiency disorders|21|21
+Transplant immunology|10|0
+@PH|General Pharmacology|I|4|5
+General pharmacology|62|40
+ANS|35|91
+Anti-cancer drugs|20|0
+@PY|Physiology|I|3|20
+Body fluid compartments|7|47
+Nerve-muscle physiology|38|0
+Cell and cytoskeleton|19|34
+Exercise physiology|5|0
+Miscellaneous|19|0
+@DE|Dermatology|S|5|31
+Basics of skin|26|57
+Papulosquamous disorders|24|0
+Infections including leprosy|83|55
+Alopecia|19|49
+STI|43|0
+Vesico-bullous disorders|21|0
+Dermatitis and acne|36|0
+Pigmentation disorders|14|44
+Skin malignancies|18|0
+Miscellaneous|38|0
+@RA|Radiology|S|6|2
+General radiology|38|84
+GI and HBP radiology|40|62
+GU radiology|28|0
+Thoracic radiology|48|71
+Neuroradiology|50|0
+Radiotherapy and Nuclear medicine|32|34
+@PS|Psychiatry|S|4|25
+Basics of psychiatry|52|65
+Psychotic disorders|46|27
+Mood disorders|61|32
+Anxiety and related disorders|34|23
+Childhood psychiatry|32|0
+Sleep and related disorders|13|25
+Miscellaneous|36|0
+@OR|Orthopedics|S|6|35
+Clinical tests|17|50
+Nerve injuries|31|0
+Fractures|61|118
+Bone infections|11|51
+Spine pathologies and scoliosis|22|0
+Bone tumors|25|0
+Metabolic bone diseases|24|49
+Pediatric orthopedics|20|0
+Miscellaneous|24|11
+@AN|Anaesthesia|S|3|5
+Airway and other instruments|55|71
+Pharmacology in anesthesia|77|29
+Regional anesthesia and Capnography|27|41
+Pre-op assessment|30|0
+Mechanical ventilation|14|0
+BLS-ACLS-NRP|25|24
+@ET|ENT|S|4|18
+Ear anatomy|24|62
+Pathologies of ear|117|84
+Facial nerve|14|12
+Paranasal sinus and nose|67|41
+ENT trauma|10|40
+Infections, Tonsils|14|0
+Head and neck spaces|15|18
+Larynx and vocal cord palsy|47|0
+Oral cavity and salivary glands|26|24
+@OP|Ophthalmology|S|4|15
+Cornea-sclera|48|81
+Lens-Cataract|24|0
+Uveitis|12|33
+Glaucoma|24|0
+Neuro-ophthalmology|42|32
+Retina|68|57
+Conjunctiva and orbit|46|73
+Squint|11|0
+Refractive errors|28|22
+@FM|FMT|S|4|15
+Injuries|42|68
+Ballistics|16|0
+Asphyxia|16|49
+Thanatology and autopsy|32|0
+Medical law|49|53
+Sexual offences|24|0
+Human identification|38|82
+Toxicology|135|0
+@BC|Biochemistry|M|4|20
+Basics of metabolism|51|72
+Carbohydrate metabolism|64|66
+Lipid metabolism|50|0
+Protein metabolism|53|56
+Minerals|25|0
+Enzyme kinetics|31|40
+Vitamins|77|0
+Molecular biology|134|100
+@MI|Microbiology|M|7|25
+Bacteriology|154|145
+Anti-microbials|27|47
+Tuberculosis and ATT|31|0
+Vector-borne diseases|67|54
+Mycology|67|0
+Virology|76|55
+HIV and ART|31|60
+Parasitology|89|0
+General microbiology and sterilization|48|19
+@AT|Anatomy|M|6|46
+Neuro-anatomy|84|19
+Head and neck|48|35
+Embryology|59|94
+Thorax|30|19
+Upper limb|29|29
+Abdomen and pelvis|39|29
+Lower limb|43|69
+Histology-Osteology|46|0
+Cadaveric sections|7|7
+@PD|Pediatrics|M|5|11
+Neonatology|111|109
+Growth and nutrition|57|42
+Genetics|46|63
+Congenital heart diseases|30|0
+Cystic fibrosis-Pneumonia|26|47
+Pediatric GI disorders|41|0
+Miscellaneous|63|30
+Developmental milestones|34|0`;
+const PLN=`1 CVS:0 PM:0 SU:0
+2 CVS:1,2,3 SU:1 PM:1
+3 CVS:4,5,6,7,8 SU:2 PM:2 OB:0,1
+4 BC:0 EN:0 SU:3 OB:2,3 PM:3,4
+5 BC:1,2 PD:0 EN:1,2,3,4
+6 BC:3,4 GI:0,1,2,3,4,5,6 SU:4,5 DE:0,1
+7 BC:5,6 PH:0,1,2 AN:0 GP:0,1
+8 BC:7 GP:2 PY:0,1,2,3,4 ET:0,6,7 AN:1
+9 BC:7 HM:0 SU:6 OB:4,5 PD:1
+10 SU:7 HM:1 OB:6,7 RH:2,3,4
+11 HM:2,3 ET:1 PD:2,3 SU:8
+12 FM:0,1 IM:0,1,2 OB:8 PM:5 SU:9,10
+13 FM:2,3 NE:0,1,2,3 OB:9 DE:2,4 SU:11
+14 FM:4,5 NE:4,5,6,7 OB:10 PM:6
+15 FM:6,7 RS:0 NE:8 OB:11,12,13,14
+16 PS:0 RN:0,1,2,3,4 PD:6,7 ET:2
+17 PS:1,2 OP:0,1 PD:4,5 RS:1,2,3,4
+18 PS:3,4 OP:2,3,4,5,6,7 DE:3,5,6
+19 PS:5,6 PM:7 OP:8 RH:0,1 AN:2,3,4 ET:3
+20 OB:15,16,17,18 DE:7,8,9 AN:5 ET:4,5,8 RS:5,6`;
+const SUB={},ORD=[];let cur;
+D.split('\n').forEach(l=>{if(l[0]=='@'){const a=l.slice(1).split('|');cur=SUB[a[0]]={k:a[0],n:a[1],g:a[2],pg:+a[3],pr:+a[4],t:[]};ORD.push(cur)}else{const a=l.split('|');cur.t.push({n:a[0],q:+a[1],m:+a[2]})}});
+const PL={};PLN.split('\n').forEach(l=>{const p=l.split(' ');PL[p[0]]=p.slice(1).map(x=>{const y=x.split(':');return{s:SUB[y[0]],ix:y[1].split(',').map(Number)}})});
+const GN={L:'LONG SUBJECTS',I:'INTEGRATED SUBJECTS',S:'SHORT SUBJECTS',M:'INTERMEDIATE SUBJECTS'};
+let S={log:[],P:{},N:{},R:{},pl:{},t0:null,day:null,sel:null};
+try{Object.assign(S,JSON.parse(localStorage.getItem('btr')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('btr',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s),pc=(a,b)=>b?Math.round(a/b*100):0;
+const hm=m=>Math.floor(m/60)+'h'+String(m%60).padStart(2,'0')+'m';
+const dk=(o=0)=>{const d=new Date(Date.now()-o*864e5-36e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const hms=s=>[s/3600|0,s/60%60|0,s%60].map(x=>String(x|0).padStart(2,'0')).join(':');
+const bar=(p,c)=>`<div class=bar><i style="width:${p}%;background:${c||'linear-gradient(90deg,var(--a),var(--a2))'}"></i></div>`;
+function prog(s){let vt=0,vd=0,qt=0,qd=0;s.t.forEach((t,i)=>{const p=(S.P[s.k]||{})[i]||{};vt+=t.m;vd+=Math.min(p.v||0,t.m);qt+=t.q;qd+=Math.min(p.q||0,t.q)});const nd=Math.min(S.N[s.k]||0,s.pg),rd=Math.min(S.R[s.k]||0,s.pr),v=pc(vd,vt),q=pc(qd,qt),n=pc(nd,s.pg),r=pc(rd,s.pr);return{vt,vd,qt,qd,nd,rd,v,q,n,r,all:Math.round((v+q+n+r)/4)}}
+function agg(d){const a={sec:0,v:0,m:0,n:0,p:0};S.log.filter(x=>x.d==d).forEach(x=>{for(const k in a)a[k]+=x[k]});return a}
+const MET=[['sec','Time (min)',x=>Math.round(x/60)],['v','Video (min)',x=>x],['m','MCQ',x=>x],['n','Notes pg',x=>x],['p','Pearls',x=>x]];
+let tab=0,tick,ent=[],el=0,open={};
+function render(){[0,1,2].forEach(i=>$('#n'+i).className=i==tab?'on':'');$('#app').innerHTML=[vClock,vPlan,vData][tab]();if(tab==0)clk()}
+[0,1,2].forEach(i=>$('#n'+i).onclick=()=>{tab=i;render()});
+function vClock(){const y=agg(dk(1)),t=agg(dk(0));let sc=[],rows=MET.map(([k,l,f])=>{const a=f(y[k]),b=f(t[k]),d=a?Math.round((b-a)/a*100):(b?100:0);if(a)sc.push(d);const mx=Math.max(a,b,1);return`<tr><td>${l}</td><td>${a}</td><td>${b}</td><td class="${d>=0?'up':'dn'}">${d>=0?'▲':'▼'} ${Math.abs(d)}%</td></tr><tr><td colspan=4>${bar(a/mx*100,'#94a3b8')}${bar(b/mx*100,b>=a?'var(--g)':'var(--r)')}</td></tr>`}).join('');const ov=sc.length?Math.round(sc.reduce((a,b)=>a+b)/sc.length):0;
+const ses=S.log.filter(x=>x.d==dk(0)||x.d==dk(1)).map(x=>`<tr><td>${x.d==dk(0)?'Aaj':'Kal'}</td><td>${hms(x.sec)}</td><td>${x.v}m</td><td>${x.m}</td><td>${x.n}</td><td>${x.p}</td></tr>`).join('');
+return`<h2>⏱ Study Clock</h2><div class=card><div class="clock ${S.t0?'run':''}" id=clk>00:00:00</div><button class="big ${S.t0?'stop':''}" onclick="${S.t0?'stopT()':'startT()'}">${S.t0?'⏹ STOP':'▶ START'}</button></div>
+<div class=card><div class=row><b>Kal vs Aaj</b><b class="${ov>=0?'up':'dn'}">${ov>=0?'📈':'📉'} ${ov>=0?'+':''}${ov}%</b></div><div class=sm>⬜ Kal &nbsp; 🟩/🟥 Aaj</div><div class=w><table><tr><th></th><th>Kal</th><th>Aaj</th><th>Δ</th></tr>${rows}</table></div></div>
+<div class=card><b>Report</b><p class=sm>${sc.length?(ov>=0?`Aaj kal se ${ov}% better 🔥 — ${sc.filter(x=>x>0).length}/${sc.length} metrics improve hue.`:`Aaj kal se ${-ov}% peeche hai — ${sc.filter(x=>x<0).length}/${sc.length} metrics down. Thoda push karo!`):'Kal ka data nahi hai — aaj ka session log karo, kal se comparison dikhega.'}</p></div>
+<div class=card><b>Sessions (time frames)</b><div class=w><table><tr><th>Din</th><th>Time</th><th>Video</th><th>MCQ</th><th>Notes</th><th>Pearls</th></tr>${ses||'<tr><td colspan=6 class=sm>Abhi koi session nahi</td></tr>'}</table></div></div>`}
+function clk(){clearInterval(tick);const u=()=>{const e=$('#clk');if(e)e.textContent=hms(S.t0?Math.floor((Date.now()-S.t0)/1e3):0)};u();if(S.t0)tick=setInterval(u,250)}
+function startT(){S.t0=Date.now();save();render()}
+function stopT(){el=Math.floor((Date.now()-S.t0)/1e3);ent=[];modal()}
+function modal(){const m=$('#md')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'md',className:'modal'}));
+m.innerHTML=`<div><h3>⏹ Session: ${hms(el)}</h3><select id=ms onchange=mt()>${Object.keys(GN).map(g=>`<optgroup label="${GN[g]}">${ORD.filter(s=>s.g==g).map(s=>`<option value=${s.k}>${s.n}</option>`).join('')}</optgroup>`).join('')}</select><select id=mtp onchange=mv()></select>
+<label class=sm>Video dekha (min)</label><input id=mv type=number min=0><label class=sm>MCQ kiye</label><input id=mq type=number min=0><label class=sm>Notes pages (is subject ke)</label><input id=mn type=number min=0 value=0><label class=sm>Pearls (is subject ke)</label><input id=mp type=number min=0 value=0>
+<button style="width:100%;margin:6px 0" onclick=addE()>➕ Entry add karo (aur topic/subject)</button><div class=sm>${ent.map(e=>`✔ ${SUB[e.k].n} › ${SUB[e.k].t[e.i]?.n||'-'}: ${e.v}m, ${e.q} MCQ, ${e.n}pg, ${e.p}🔸`).join('<br>')}</div>
+<button class=big style="margin-top:8px" onclick=fin()>💾 Save session</button><button style="width:100%;margin-top:6px" onclick="$('#md').remove()">Cancel (timer chalta rahega)</button></div>`;mt()}
+function mt(){const s=SUB[$('#ms').value];$('#mtp').innerHTML=s.t.map((t,i)=>`<option value=${i}>${t.n} (${t.m}m | ${t.q})</option>`).join('');mv()}
+function mv(){const t=SUB[$('#ms').value].t[$('#mtp').value];$('#mv').value=t.m;$('#mq').value=t.q}
+function addE(){ent.push({k:$('#ms').value,i:+$('#mtp').value,v:+$('#mv').value||0,q:+$('#mq').value||0,n:+$('#mn').value||0,p:+$('#mp').value||0});const k=$('#ms').value;modal();$('#ms').value=k;mt()}
+function fin(){if($('#mv').value>0||$('#mq').value>0||$('#mn').value>0||$('#mp').value>0)ent.push({k:$('#ms').value,i:+$('#mtp').value,v:+$('#mv').value||0,q:+$('#mq').value||0,n:+$('#mn').value||0,p:+$('#mp').value||0});
+const L={d:dk(0),sec:el,v:0,m:0,n:0,p:0};ent.forEach(e=>{const s=SUB[e.k],t=s.t[e.i];L.v+=e.v;L.m+=e.q;L.n+=e.n;L.p+=e.p;const P=S.P[e.k]=S.P[e.k]||{},o=P[e.i]=P[e.i]||{};o.v=Math.min(t.m,(o.v||0)+e.v);o.q=Math.min(t.q,(o.q||0)+e.q);S.N[e.k]=Math.min(s.pg,(S.N[e.k]||0)+e.n);S.R[e.k]=Math.min(s.pr,(S.R[e.k]||0)+e.p)});
+S.log.push(L);S.t0=null;save();$('#md').remove();render();const y=agg(dk(1)),t=agg(dk(0)),d=MET.filter(([k])=>y[k]).map(([k])=>(t[k]-y[k])/y[k]*100);if(d.length){const o=Math.round(d.reduce((a,b)=>a+b)/d.length);fx(o>=0,o)}}
+function fx(w,o){const e=document.createElement('div');e.className='fx '+(w?'win':'lose');e.innerHTML=`<div class=big>${w?'🏆':'💀'}</div><h1>${w?'YOU WIN!':'YOU LOSE'}</h1><p>Kal ke mukable ${w?'+':''}${o}% — ${w?'Keep crushing it! 🔥':'Kal wapas aao stronger!'}</p>`;if(w)for(let i=0;i<60;i++){const c=document.createElement('i');c.className='cf';c.style.cssText=`left:${Math.random()*100}%;background:hsl(${Math.random()*360},90%,60%);animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()}s`;e.append(c)}e.onclick=()=>e.remove();document.body.append(e);setTimeout(()=>e.remove(),5000)}
+function dday(){return S.day||(()=>{const d=new Date(Date.now()-36e5);return d.getFullYear()==2026&&d.getMonth()==11&&d.getDate()<=20?String(d.getDate()):'1'})()}
+function vPlan(){const d=dday(),it=PL[d];let tot=0,dn=0,vm=0,qm=0;const cards=it.map((x,j)=>{const s=x.s,ts=x.ix.map(i=>s.t[i]),v=ts.reduce((a,t)=>a+t.m,0),q=ts.reduce((a,t)=>a+t.q,0),p=prog(s);vm+=v;qm+=q;let vd=0,qd=0;x.ix.forEach(i=>{const o=(S.P[s.k]||{})[i]||{};vd+=Math.min(o.v||0,s.t[i].m);qd+=Math.min(o.q||0,s.t[i].q)});
+const f=['v','q','n','p'],id=d+s.k,ch=f.filter(k=>S.pl[id+k]).length;tot+=4;dn+=ch;
+const R=[['v','🎬 Video',`${hm(v)}`,pc(vd,v)],['q','📝 MCQ',`${q}`,pc(qd,q)],['n','📖 Notes',`${s.pg} pg total (${S.N[s.k]||0} done)`,p.n],['p','🔸 Pearls',`${s.pr} total (${S.R[s.k]||0} done)`,p.r]];
+return`<div class=card><div class=row onclick="op('${id}')" style="cursor:pointer"><div><b>${s.n}</b><div class=sm>${ts.map(t=>t.n).join(' + ')}</div><div class=sm>${hm(v)} | ${q} MCQ</div></div><b>${ch*25}% ${open[id]?'▲':'▼'}</b></div>${bar(ch*25)}${open[id]?R.map(r=>`<div class=row style="margin-top:6px"><label><input type=checkbox ${S.pl[id+r[0]]?'checked':''} onchange="tg('${d}','${s.k}','${r[0]}',[${x.ix}],this.checked)"> ${r[1]} <span class=sm>${r[2]}</span></label><span>${r[3]}%</span></div>${bar(r[3])}`).join(''):''}</div>`}).join('');
+const sum=Object.keys(PL).map(k=>PL[k].map((x,j)=>{const ts=x.ix.map(i=>x.s.t[i]);return`<tr><td>${j?'':k+' Dec'}</td><td>${x.s.n}</td><td>${ts.map(t=>t.n).join(', ')}</td><td>${hm(ts.reduce((a,t)=>a+t.m,0))}</td><td>${ts.reduce((a,t)=>a+t.q,0)}</td></tr>`}).join('')).join('');
+return`<h2>📅 Daily Plan</h2><div class=chips>${Object.keys(PL).map(k=>`<button class="${k==d?'on':''}" onclick="S.day='${k}';save();render()">${k} Dec</button>`).join('')}</div><div class=card><div class=row><b>${d} Dec 2026</b><b>${pc(dn,tot)}% done</b></div>${bar(pc(dn,tot))}<div class=sm>${hm(vm)} video | ${qm} MCQ</div></div>${cards}<div class=card><b>Plan Summary</b>${psum()}</div>`}
+function op(id){open[id]=!open[id];render()}
+function tg(d,k,f,ix,on){S.pl[d+k+f]=on?1:0;if(f=='v'||f=='q'){const s=SUB[k],P=S.P[k]=S.P[k]||{};ix.forEach(i=>{const o=P[i]=P[i]||{};o[f]=on?s.t[i][f=='v'?'m':'q']:0})}save();render()}
+function vData(){let h='',T={v:0,q:0,p:0,g:0};const ex=S.sel&&SUB[S.sel];
+Object.keys(GN).forEach(g=>{h+=`<div class=gh>${GN[g]}</div>`+ORD.filter(s=>s.g==g).map(s=>`<button class="sb ${S.sel==s.k?'on':''}" onclick="S.sel=S.sel=='${s.k}'?null:'${s.k}';save();render()">${s.n} ${prog(s).all}%</button>`).join('')});
+let det='';if(ex){const p=prog(ex);det=`<div class=card><h3 style="margin:0">${ex.n} — ${p.all}%</h3>${bar(p.all)}<div class=sm>🎬 Video ${p.v}% (${hm(p.vd)}/${hm(p.vt)})</div>${bar(p.v)}<div class=sm>📝 MCQ ${p.q}% (${p.qd}/${p.qt})</div>${bar(p.q)}<div class=sm>📖 Notes ${p.n}% (${p.nd}/${ex.pg} pg)</div>${bar(p.n)}<div class=sm>🔸 Pearls ${p.r}% (${p.rd}/${ex.pr})</div>${bar(p.r)}
+<b>🎬 Videos</b><div class=w><table><tr><th>Video</th><th>Time</th><th>Done</th></tr>${ex.t.map((t,i)=>t.m?`<tr><td>${t.n}</td><td>${hm(t.m)}</td><td>${pc(Math.min(((S.P[ex.k]||{})[i]||{}).v||0,t.m),t.m)}%</td></tr>`:'').join('')}</table></div>
+<b>📝 MCQ per topic</b><div class=w><table><tr><th>Topic</th><th>MCQ</th><th>Done</th></tr>${ex.t.map((t,i)=>`<tr><td>${t.n}</td><td>${t.q}</td><td>${pc(((S.P[ex.k]||{})[i]||{}).q||0,t.q)}%</td></tr>`).join('')}</table></div><p class=sm>📖 Notes: ${ex.pg} pages | 🔸 Pearls: ${ex.pr}</p></div>`}
+const rows=Object.keys(GN).map(g=>`<tr><td colspan=5 class=sm><b>${GN[g]}</b></td></tr>`+ORD.filter(s=>s.g==g).map(s=>{const p=prog(s);T.v+=p.vt;T.q+=p.qt;T.p+=s.pr;T.g+=s.pg;return`<tr><td>${s.n}</td><td>${hm(p.vt)}</td><td>${p.qt}</td><td>${s.pr}</td><td>${s.pg}</td></tr>`}).join('')).join('');
+return`<h2>📊 Subject Data</h2>${h}${det}<div class=card><b>Total Table</b><div class=w><table><tr><th>Subject</th><th>Video</th><th>MCQ</th><th>Pearls</th><th>Notes pg</th></tr>${rows}<tr><td><b>TOTAL</b></td><td><b>${hm(T.v)}</b></td><td><b>${T.q}</b></td><td><b>${T.p}</b></td><td><b>${T.g}</b></td></tr></table></div></div>`}
+
+const ES=()=>(S.acc||0)+(S.t0?Math.floor((Date.now()-S.t0)/1e3):0),act=()=>S.t0||S.ps;
+const PAL=['#a78bfa','#22d3ee','#f472b6','#facc15','#34d399','#fb923c'];let mty='v',msk='PM',mti=0;
+function agg(d){const a={sec:0,v:0,m:0,n:0,p:0,c:0,w:0};S.log.filter(x=>x.d==d).forEach(x=>{for(const k in a)a[k]+=x[k]||0});return a}
+function bc(t,v,l,c){const mx=Math.max(...v,1),n=v.length,W=300,H=100,sw=(W-20)/n,bw=Math.min(50,sw-10);return`<div class=ch><b>${t}</b><svg viewBox="0 0 ${W} ${H+30}">${v.map((x,i)=>{const bh=x/mx*H,X=10+i*sw+(sw-bw)/2;return`<rect class=rb x=${X} y=${H-bh+14} width=${bw} height=${Math.max(bh,1)} rx=6 fill="${c[i%c.length]}" style="animation-delay:${i*.1}s"/><text x=${X+bw/2} y=${H-bh+10} text-anchor=middle font-size=12 font-weight=700 fill=currentColor>${x}</text><text x=${X+bw/2} y=${H+27} text-anchor=middle font-size=11 fill=currentColor opacity=.7>${l[i]}</text>`}).join('')}</svg></div>`}
+function ac(t,it){return`<b>${t}</b>`+it.map(i=>{const T=i.c+i.w,p=pc(i.c,T);return`<div class=sm>${i.l}: ✅ ${i.c} sahi &nbsp; ❌ ${i.w} galat &nbsp; (${p}%)</div><div class=bar style="display:flex"><i style="width:${p}%;background:var(--g)"></i><i style="width:${T?100-p:0}%;background:var(--r)"></i></div>`}).join('')}
+function vClock(){const y=agg(dk(1)),t=agg(dk(0)),ses=S.log.filter(x=>x.d==dk(0)),sc=[];
+const G=MET.map(([k,l,f])=>{const a=f(y[k]),b=f(t[k]),d=a?Math.round((b-a)/a*100):(b?100:0);if(a)sc.push(d);return{l,a,b,d}});
+const ov=sc.length?Math.round(sc.reduce((a,b)=>a+b)/sc.length):0;
+return`<h2>⏱ Study Clock</h2><div class="card hero"><div class=cw><svg viewBox="0 0 100 100"><defs><linearGradient id=lg x1=0 y1=0 x2=1 y2=1><stop offset=0 stop-color="#a78bfa"/><stop offset=1 stop-color="#22d3ee"/></linearGradient></defs><circle cx=50 cy=50 r=46 fill=none stroke="var(--b)" stroke-width=4 /><circle id=rg cx=50 cy=50 r=46 fill=none stroke="url(#lg)" stroke-width=4 stroke-linecap=round stroke-dasharray=289 stroke-dashoffset=289 /></svg><div class="dig ${S.t0?'run':''}" id=clk>00:00:00</div></div><div class=st>${S.t0?'🟢 Padhai chalu hai':S.ps?'⏸ Paused':'Ready ho? Start karo! 🚀'}</div>${act()?`<div class=two><button class=big onclick=pauseT()>${S.t0?'⏸ Pause':'▶ Resume'}</button><button class="big stop" onclick=stopT()>⏹ Stop</button></div>`:`<button class=big onclick=startT()>▶ START</button>`}</div>
+<div class=card><div class=row><b>📊 Kal vs Aaj</b><b class="${ov>=0?'up':'dn'}">${ov>=0?'📈 +':'📉 '}${ov}%</b></div><div class=grid>${G.map(g=>bc(g.l,[g.a,g.b],['Kal','Aaj'],['#94a3b8',g.b>=g.a?'#10b981':'#ef4444'])).join('')}</div><div class=w><table><tr><th></th><th>Kal</th><th>Aaj</th><th>Δ</th></tr>${G.map(g=>`<tr><td>${g.l}</td><td>${g.a}</td><td>${g.b}</td><td class="${g.d>=0?'up':'dn'}">${g.d>=0?'▲':'▼'} ${Math.abs(g.d)}%</td></tr>`).join('')}</table></div></div>
+<div class=card>${ac('🎯 MCQ accuracy',[{l:'Kal',c:y.c,w:y.w},{l:'Aaj',c:t.c,w:t.w}])}${wcmp(y,t)}</div>
+<div class=card><b>📝 Report</b><p class=sm>${sc.length?(ov>=0?`Aaj kal se ${ov}% better 🔥 — ${sc.filter(x=>x>0).length}/${sc.length} metrics improve hue.`:`Aaj kal se ${-ov}% peeche hai — ${sc.filter(x=>x<0).length}/${sc.length} metrics down. Thoda push karo! 💪`):'Kal ka data nahi hai — aaj ka session log karo, kal se comparison dikhega.'}</p></div>
+<div class=card><b>🕒 Aaj ke Sessions</b>${ses.length?`<div class=grid>${MET.map(([k,l,f])=>bc(l,ses.map(x=>f(x[k]||0)),ses.map((x,i)=>'S'+(i+1)),PAL)).join('')}</div>${ac('🎯 Session-wise accuracy',ses.map((x,i)=>({l:'S'+(i+1),c:x.c||0,w:x.w||0})))}<div class=w><table><tr><th>#</th><th>Time</th><th>Video</th><th>MCQ</th><th>Notes</th><th>Pearls</th></tr>${ses.map((x,i)=>`<tr><td>S${i+1}</td><td>${hms(x.sec)}</td><td>${x.v}m</td><td>${x.m}</td><td>${x.n}</td><td>${x.p}</td></tr>`).join('')}</table></div>`:'<p class=sm>Aaj abhi koi session nahi.</p>'}</div>`}
+function clk(){clearInterval(tick);const u=()=>{const e=$('#clk');if(!e)return;const s=ES();e.textContent=hms(s);const r=$('#rg');if(r)r.style.strokeDashoffset=289*(1-(s%60)/60)};u();if(S.t0)tick=setInterval(u,250)}
+function startT(){S.t0=Date.now();S.acc=0;S.ps=false;save();render()}
+function pauseT(){if(S.t0){S.acc=ES();S.t0=null;S.ps=true}else{S.t0=Date.now();S.ps=false}save();render()}
+function stopT(){el=ES();S.acc=el;S.t0=null;S.ps=true;save();ent=[];render();modal()}
+function modal(){const m=$('#md')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'md',className:'modal'})),s=SUB[msk];
+m.innerHTML=`<div><h3>⏹ Session: ${hms(el)}</h3><div class=chips>${[['v','🎬 Video'],['m','📝 MCQ'],['n','📖 Notes'],['p','🔸 Pearls']].map(t=>`<button class="${mty==t[0]?'on':''}" onclick="mty='${t[0]}';modal()">${t[1]}</button>`).join('')}</div>
+<select onchange="msk=this.value;mti=0;modal()">${Object.keys(GN).map(g=>`<optgroup label="${GN[g]}">${ORD.filter(x=>x.g==g).map(x=>`<option value=${x.k} ${x.k==msk?'selected':''}>${x.n}</option>`).join('')}</optgroup>`).join('')}</select>
+${mty=='v'||mty=='m'?`<select onchange="mti=+this.value;modal()">${s.t.map((t,i)=>`<option value=${i} ${i==mti?'selected':''}>${t.n} (${t.m}m | ${t.q} MCQ)</option>`).join('')}</select>`:''}
+${mty=='v'?'<label class=sm>Kitne minute video dekha?</label><input id=f1 type=number min=0 placeholder="e.g. 45">':mty=='m'?'<label class=sm>📝 Total MCQ solve kiye?</label><input id=f1 type=number min=0 oninput=acx()><label class=sm>❌ Usme kitne galat?</label><input id=f2 type=number min=0 oninput=acx()><div id=ax></div>':mty=='n'?'<label class=sm>Kitne notes pages padhe?</label><input id=f1 type=number min=0>':'<label class=sm>Kitne pearls padhe?</label><input id=f1 type=number min=0>'}
+<button style="width:100%;margin:6px 0" onclick=addE()>➕ Entry add karo (aur data bharna ho to)</button><div class=sm>${ent.map(e=>{const n=SUB[e.k].n;return e.t=='v'?`🎬 ${n} › ${SUB[e.k].t[e.i].n}: ${e.v}m`:e.t=='m'?`📝 ${n} › ${SUB[e.k].t[e.i].n}: ✅${e.c} ❌${e.w} (${pc(e.c,e.c+e.w)}%)`:e.t=='n'?`📖 ${n}: ${e.n} pg`:`🔸 ${n}: ${e.p}`}).join('<br>')}</div>
+<button class=big style="margin-top:8px" onclick=fin()>💾 Save session</button><button style="width:100%;margin-top:6px" onclick="$('#md').remove();render()">Cancel (timer paused rahega)</button></div>`}
+function acx(){$('#ax').innerHTML=ac('🎯 Accuracy',[{l:'Ye entry',c:+$('#f1').value||0,w:+$('#f2').value||0}])}
+function curE(){const a=+($('#f1')?.value)||0,b=+($('#f2')?.value)||0;if(!a&&!b)return null;return mty=='v'?{k:msk,i:mti,t:'v',v:a}:mty=='m'?{k:msk,i:mti,t:'m',c:a,w:b}:mty=='n'?{k:msk,t:'n',n:a}:{k:msk,t:'p',p:a}}
+function addE(){const e=curE();if(e)ent.push(e);modal()}
+function fin(){const e0=curE();if(e0)ent.push(e0);const L={d:dk(0),sec:el,v:0,m:0,n:0,p:0,c:0,w:0};
+ent.forEach(e=>{const s=SUB[e.k],P=S.P[e.k]=S.P[e.k]||{},o=e.i!=null?(P[e.i]=P[e.i]||{}):0;
+if(e.t=='v'){L.v+=e.v;o.v=Math.min(s.t[e.i].m,(o.v||0)+e.v)}
+else if(e.t=='m'){L.m+=e.c+e.w;L.c+=e.c;L.w+=e.w;o.q=Math.min(s.t[e.i].q,(o.q||0)+e.c+e.w);const A=S.A=S.A||{};A[e.k]=A[e.k]||{c:0,w:0};A[e.k].c+=e.c;A[e.k].w+=e.w}
+else if(e.t=='n'){L.n+=e.n;S.N[e.k]=Math.min(s.pg,(S.N[e.k]||0)+e.n)}
+else{L.p+=e.p;S.R[e.k]=Math.min(s.pr,(S.R[e.k]||0)+e.p)}});
+S.log.push(L);S.t0=null;S.ps=false;S.acc=0;save();$('#md').remove();render();
+const y=agg(dk(1)),t=agg(dk(0)),d=MET.filter(([k])=>y[k]).map(([k])=>(t[k]-y[k])/y[k]*100);if(d.length){const o=Math.round(d.reduce((a,b)=>a+b)/d.length);fx(o>=0,o)}}
+function tS(k){S.sel=S.sel==k?null:k;save();render();setTimeout(()=>{const e=document.getElementById('s_'+k);e&&e.scrollIntoView({behavior:'smooth',block:'start'})},60)}
+function sc(s,i){const p=prog(s),o=S.sel==s.k,A=(S.A||{})[s.k]||{c:0,w:0};
+return`<div class="card sj ${o?'op':''}" id="s_${s.k}" style="--c1:hsl(${i*37%360},85%,62%)"><div class=row onclick="tS('${s.k}')" style="cursor:pointer"><div class=row style="justify-content:flex-start;gap:12px"><div class=ring style="--p:${p.all}"><span>${p.all}%</span></div><b>${i+1}. ${s.n}</b></div><span>${o?'▲':'▼'}</span></div>${o?`<div class=four>${[['🎬 Video',p.v,`${hm(p.vd)}/${hm(p.vt)}`],['📝 MCQ',p.q,`${p.qd}/${p.qt}`],['📖 Notes',p.n,`${p.nd}/${s.pg} pg`],['🔸 Pearls',p.r,`${p.rd}/${s.pr}`]].map(x=>`<div class=cc><div class=ring style="--p:${x[1]}"><span>${x[1]}%</span></div><div class=sm>${x[0]}<br>${x[2]}</div></div>`).join('')}</div>
+<b>🎬 Videos</b><div class=w><table><tr><th>Video</th><th>Time</th><th>Done</th></tr>${s.t.map((t,j)=>t.m?`<tr><td>${t.n}</td><td>${hm(t.m)}</td><td>${pc(Math.min(((S.P[s.k]||{})[j]||{}).v||0,t.m),t.m)}%</td></tr>`:'').join('')}</table></div>
+<b>📝 MCQ per topic</b><div class=w><table><tr><th>Topic</th><th>MCQ</th><th>Done</th></tr>${s.t.map((t,j)=>`<tr><td>${t.n}</td><td>${t.q}</td><td>${pc(((S.P[s.k]||{})[j]||{}).q||0,t.q)}%</td></tr>`).join('')}</table></div>
+<p class=sm>📖 Notes: ${s.pg} pages | 🔸 Pearls: ${s.pr}</p>${A.c+A.w?ac('🎯 MCQ accuracy',[{l:s.n,c:A.c,w:A.w}]):''}`:''}</div>`}
+function vData(){let i=0,T={v:0,q:0,p:0,g:0};const h=Object.keys(GN).map(g=>`<div class=gh>${GN[g]}</div>`+ORD.filter(s=>s.g==g).map(s=>sc(s,i++)).join('')).join('');
+const rows=Object.keys(GN).map(g=>`<tr><td colspan=5 class=sm><b>${GN[g]}</b></td></tr>`+ORD.filter(s=>s.g==g).map(s=>{const p=prog(s);T.v+=p.vt;T.q+=p.qt;T.p+=s.pr;T.g+=s.pg;return`<tr><td>${s.n}</td><td>${hm(p.vt)}</td><td>${p.qt}</td><td>${s.pr}</td><td>${s.pg}</td></tr>`}).join('')).join('');
+return`<h2>📊 Subject Data</h2>${h}<div class=card><b>📋 Total Table</b><div class=w><table><tr><th>Subject</th><th>Video</th><th>MCQ</th><th>Pearls</th><th>Notes pg</th></tr>${rows}<tr><td><b>TOTAL</b></td><td><b>${hm(T.v)}</b></td><td><b>${T.q}</b></td><td><b>${T.p}</b></td><td><b>${T.g}</b></td></tr></table></div></div>`}
+
+
+if(!S.nt)S.nt={on:false,ev:2,last:0};
+function psum(){let r='';Object.keys(PL).forEach(k=>PL[k].forEach((x,j)=>{const ts=x.ix.map(i=>x.s.t[i]);r+=`<tr class="${j?'':'d0'}"><td>${j?'':'<b>'+k+' Dec</b>'}</td><td><b>${x.s.n}</b><div class=tp>${ts.map(t=>t.n).join(', ')}</div></td><td>${hm(ts.reduce((a,t)=>a+t.m,0))}</td><td>${ts.reduce((a,t)=>a+t.q,0)}</td></tr>`}));return`<table class=ps><colgroup><col style="width:17%"><col><col style="width:17%"><col style="width:13%"></colgroup><tr><th>Date</th><th>Subject / Topics</th><th>Video</th><th>MCQ</th></tr>${r}</table>`}
+function curE(){const a=+($('#f1')?.value)||0,b=Math.min(+($('#f2')?.value)||0,a);if(!a)return null;return mty=='v'?{k:msk,i:mti,t:'v',v:a}:mty=='m'?{k:msk,i:mti,t:'m',c:a-b,w:b}:mty=='n'?{k:msk,t:'n',n:a}:{k:msk,t:'p',p:a}}
+function acx(){const a=+$('#f1').value||0,b=Math.min(+$('#f2').value||0,a);$('#ax').innerHTML=ac('🎯 Accuracy',[{l:`${a} solved`,c:a-b,w:b}])}
+function wcmp(y,t){if(!y.m||!t.m)return'<p class=sm>Galat ka comparison tab dikhega jab kal aur aaj dono din MCQ log honge.</p>';const yp=pc(y.w,y.m),tp=pc(t.w,t.m),ok=tp<yp||(tp==yp&&t.w<=y.w);return`<div class=row style="margin-top:8px"><span class=sm>Kal: ${y.m} solved, ❌ ${y.w} galat (${yp}%)<br>Aaj: ${t.m} solved, ❌ ${t.w} galat (${tp}%)</span><b class="${ok?'up':'dn'}">${ok?'✅ Galat kam hua! 🎉':'⚠️ Galat badha'}</b></div>`}
+function pend(){const d=dday(),it=PL[d]||[];let tot=0,dn=0,left=[];it.forEach(x=>{const id=d+x.s.k,c=['v','q','n','p'].filter(k=>S.pl[id+k]).length;tot+=4;dn+=c;if(c<4)left.push(x.s.n)});return{d,p:pc(dn,tot),left}}
+function msg(){const q=pend();return q.p<100?`🔥 Aaj ka plan ${q.p}% done. Baaki: ${q.left.slice(0,3).join(', ')}. Ek session start karo, tum kar sakte ho! 💪`:'🏆 Aaj ka plan complete! Ek MCQ round aur lagao?'}
+function tgt(){return`<div class="card tg"><b>🎯 Aaj ka target</b><p class=sm style="margin:6px 0">${msg()}</p>${bar(pend().p)}</div>`}
+async function ntf(x){try{const r=await navigator.serviceWorker.getRegistration();if(r)return r.showNotification('BTR Study 📚',{body:x,icon:'icon-192.png',tag:'btr',renotify:true});new Notification('BTR Study 📚',{body:x})}catch(e){}}
+function nCard(){const ok='Notification' in window;return`<div class=card><b>🔔 Reminders</b><p class=sm>${ok?(S.nt.on?'ON — app khula/installed ho to yaad dilata rahunga.':'OFF — ON karke permission allow karo.'):'Is browser me notifications support nahi.'}</p><div class=two><button onclick=nOn()>${S.nt.on?'🔕 OFF karo':'🔔 ON karo'}</button><select onchange="S.nt.ev=+this.value;save()">${[1,2,3,4].map(h=>`<option value=${h} ${S.nt.ev==h?'selected':''}>Har ${h} ghanta</option>`).join('')}</select></div><button style="width:100%;margin-top:6px" onclick="ntf(msg())">🧪 Test notification</button></div>`}
+function nOn(){if(!('Notification' in window))return alert('Notifications support nahi hai.');if(S.nt.on){S.nt.on=false;save();return render()}Notification.requestPermission().then(p=>{if(p=='granted'){S.nt.on=true;save();try{navigator.serviceWorker.ready.then(r=>r.periodicSync&&r.periodicSync.register('btr-remind',{minInterval:3*36e5})).catch(()=>{})}catch(e){}ntf('Reminders ON ✅ Padhai ki yaad dilata rahunga!');render()}else alert('Notification permission allow karo (browser/phone settings).')})}
+function chkN(){const n=S.nt;if(!n.on||!('Notification' in window)||Notification.permission!='granted'||act())return;const h=new Date().getHours();if(h<7||h>=23||Date.now()-(n.last||0)<n.ev*36e5)return;n.last=Date.now();save();ntf(msg())}
+setInterval(chkN,6e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chkN()});
+const r0=render;render=function(){r0();if(tab==0){const m=$('#app');m.insertAdjacentHTML('beforeend',nCard());m.querySelector('h2').insertAdjacentHTML('afterend',tgt())}};
+setTimeout(chkN,2000);
+
+render();
+</script><script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script></body></html>
